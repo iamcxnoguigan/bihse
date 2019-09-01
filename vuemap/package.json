@@ -11,9 +11,15 @@
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "lint": "eslint --ext .js,.vue src test/unit test/e2e/specs",
-    "build": "node build/build.js"
+    "build": "node build/build.js",
+    "experss": "node ./js/experss.js"
   },
   "dependencies": {
+    "axios": "^0.19.0",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
     "readline": "^1.3.0",
     "vue": "^2.5.2",
     "vue-baidu-map": "^0.21.22",
