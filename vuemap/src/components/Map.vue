@@ -1,57 +1,86 @@
 <template>
-  <baidu-map class='bm-view' :center="center" :zoom="zoom" @ready="handler">
-     <bm-overlay
-    ref="customOverlay"
-    :class="{sample: true}"
-    :icon="{url: 'https://www.cnblogs.com/images/cnblogs_com/progor/1390402/o_bike2.png', size: {width: 5, height: 5}}"
-    pane="labelPane"
-    @draw="draw">
-  </bm-overlay>
-  <button class="startProcess" type="button" v-on:click="startProcess()">启动流程</button>
-  <div v-show="shipshow" class="info">
-     <table border="1">
-            <tr>
-                <th>船只物流信息</th>
-                <th>数值</th>
-            </tr>
-            <tr>
-                <td>经度</td>
-                <td>{{ position.lng}}</td>
-            </tr>
-            <tr>
-                <td>维度</td>
-                <td>{{position.lat}}</td>
-            </tr>
-             <tr>
-                <td>温度</td>
-                <td>{{temperature}} ℃</td>
-            </tr>
-             <tr>
-                <td>湿度</td>
-                <td>{{humidity}} %</td>             
-            </tr>
-        </table>
-  </div>
-  <div v-show="carshow" class="infocar">
-     <table border="1">
-            <tr>
-                <th>货车物流信息</th>
-                <th>数值</th>
-            </tr>
-            <tr>
-                <td>经度</td>
-                <td>{{ position.lng}}</td>
-            </tr>
-            <tr>
-                <td>维度</td>
-                <td>{{position.lat}}</td>
-            </tr>
-             <tr>
-                <td>状态</td>
-                <td>C语言之父</td>
-            </tr>
-        </table>
-  </div>
+  <baidu-map class='bm-view'
+             :center="center"
+             :zoom="zoom"
+             @ready="handler">
+    <bm-overlay ref="customOverlay"
+                :class="{sample: true}"
+                :icon="{url: 'https://www.cnblogs.com/images/cnblogs_com/progor/1390402/o_bike2.png', size: {width: 5, height: 5}}"
+                pane="labelPane"
+                @draw="draw">
+    </bm-overlay>
+    <button class="startProcess"
+            type="button"
+            v-on:click="startProcess()">启动流程</button>
+    <el-form :model="ruleForm"
+             :rules="rules"
+             ref="ruleForm"
+             label-width="0px"
+             class="demo-ruleForm">
+      <el-form-item prop="delay_time">
+        <el-input v-model="ruleForm.dtime"
+                  class="input-color"
+                  placeholder="delay time"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="aside-link"
+                   @click="handleCommand()">提交</el-button>
+      </el-form-item>
+    </el-form>
+    <div v-show="shipshow"
+         class="info">
+      <table border="1">
+        <tr>
+          <th>船只物流信息</th>
+          <th>数值</th>
+        </tr>
+        <tr>
+          <td>经度</td>
+          <td>{{ position.lng}}</td>
+        </tr>
+        <tr>
+          <td>维度</td>
+          <td>{{position.lat}}</td>
+        </tr>
+        <tr>
+          <td>温度</td>
+          <td>{{temperature}} ℃</td>
+        </tr>
+        <tr>
+          <td>湿度</td>
+          <td>{{humidity}} %</td>
+        </tr>
+      </table>
+    </div>
+    <div v-show="carshow"
+         class="infocar">
+      <table border="1">
+        <tr>
+          <th>货车物流信息</th>
+          <th>数值</th>
+        </tr>
+        <tr>
+          <td>经度</td>
+          <td>{{ position.lng}}</td>
+        </tr>
+        <tr>
+          <td>维度</td>
+          <td>{{position.lat}}</td>
+        </tr>
+        <tr>
+          <td>状态</td>
+          <td>C语言之父</td>
+        </tr>
+        <tr>
+          <td>下一港口</td>
+          <td>C语言之父</td>
+        </tr>
+        <tr>
+          <td>港口延误时间</td>
+          <td>C语言之父</td>
+        </tr>
+      </table>
+    </div>
   </baidu-map>
 </template>
 
@@ -70,8 +99,8 @@ export default {
       deep: true
     },
     interval: function () {
-      clearInterval(this.timer);
-      this.timer = setInterval(this.setPosition, this.interval);
+      clearInterval(this.timer)
+      this.timer = setInterval(this.setPosition, this.interval)
     }
   },
   data () {
@@ -82,27 +111,35 @@ export default {
       timer: '',
       interval: '',
       index: 0,
-      center: {lng: 0, lat: 0},
+      center: { lng: 0, lat: 0 },
       zoom: 3,
       active: false,
       pointColor: '',
-      position:{
+      position: {
         lng: 114.54404,
         lat: 30.66266
       },
       temperature: 0,
       humidity: 0,
-      pdata: new Array()
+      pdata: [],
+      ruleForm: {
+        delay_time: ''
+      },
+      rules: {
+        delay_time: [
+          { required: true, message: 'Please enter your user name', trigger: 'blur' }
+        ]
+      }
     }
   },
   // mounted() {
   //     this.timer = setInterval(this.setPosition, 1000);
   // },
-  created: async function() {
+  created: async function () {
     await this.getPosition()
   },
   methods: {
-    handler ({BMap, map}) {
+    handler ({ BMap, map }) {
       console.log(BMap, map)
       this.center.lng = 118.18214
       this.center.lat = 30.640765
@@ -115,7 +152,7 @@ export default {
       el.style.left = pixel.x - 10 + 'px'
       el.style.top = pixel.y - 10 + 'px'
     },
-    getPosition:  async function () {
+    getPosition: async function () {
       await axios.get('http://localhost:9001/getLocation').then(response => {
         this.pdata = response.data
         console.log(response.data[1])
@@ -123,28 +160,28 @@ export default {
         console.log(err)
       })
     },
-    setPosition() {
-      if(true)  {
-      // console.log("shuju",this.pdata[this.index])
-       var m = this.pdata[this.index].split(",");
-       this.index +=1
-       var t2 = new Date(m[2])
-       this.position = {lng : m[0],lat : m[1]}
-       this.interval = (t2 - this.t1)/24000
-       var t = parseInt(Math.random()*100)
-       var h = parseInt(Math.random()*500)
-       this.temperature = 23 +  t/10
-       this.humidity = 30 + h/10
-       console.log('lng:' + this.position.lng + ' ' + 'lat:' + this.position.lat)
-      } 
+    setPosition () {
+      if (true) {
+        // console.log("shuju",this.pdata[this.index])
+        var m = this.pdata[this.index].split(',')
+        this.index += 1
+        var t2 = new Date(m[2])
+        this.position = { lng: m[0], lat: m[1] }
+        this.interval = (t2 - this.t1) / 24000000
+        var t = parseInt(Math.random() * 100)
+        var h = parseInt(Math.random() * 500)
+        this.temperature = 23 + t / 10
+        this.humidity = 30 + h / 10
+        console.log('lng:' + this.position.lng + ' ' + 'lat:' + this.position.lat)
+      }
     },
-    startProcess() {
+    startProcess () {
       this.shipshow = true
       this.setPosition()
     }
   },
-  beforeDestroy() {
-      clearInterval(this.timer);
+  beforeDestroy () {
+    clearInterval(this.timer)
   }
 }
 </script>
@@ -155,11 +192,11 @@ export default {
   height: 600px;
 }
 .sample {
-  height:0px;
-	width:10px;
-	border-top:10px solid #FF0000;
-	border-left:6px solid transparent;
-	border-right:6px solid transparent;
+  height: 0px;
+  width: 10px;
+  border-top: 10px solid #ff0000;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
   line-height: 0px;
   border-radius: 0px;
   /* background-image: url("../assets/logo.png"); */
@@ -173,32 +210,33 @@ export default {
   position: absolute;
 }
 .sample.active {
-  background: rgba(0,0,0,0.75);
+  background: rgba(0, 0, 0, 0.75);
   color: #fff;
 }
-.info{
+.info {
   position: absolute;
-  top:60px;
-  left:1150px;
+  top: 60px;
+  left: 1150px;
 }
-.infocar{
+.infocar {
   position: absolute;
-  top:260px;
-  left:1150px;
+  top: 260px;
+  left: 1150px;
 }
-.startProcess{
-  float: left;
-  background-color: #4CAF50; /* Green */
+.startProcess {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  background-color: #4caf50; /* Green */
   border: none;
   color: white;
-  padding: 15px 32px;
+  padding: 10px 20px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
 }
-.startProcess:focus {  
-  background-color:red;  
-} 
-
+.startProcess:focus {
+  background-color: red;
+}
 </style>
