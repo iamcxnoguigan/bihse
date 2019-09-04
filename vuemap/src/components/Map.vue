@@ -9,6 +9,16 @@
                 pane="labelPane"
                 @draw="draw">
     </bm-overlay>
+    <bm-driving
+      start="咸宁"
+      :end="endpoint"
+      :auto-viewport="true"
+      policy="BMAP_DRIVING_POLICY_LEAST_DISTANCE"
+      :panel="false">
+    </bm-driving>
+    <input class='processid'
+          placeholder="流程模型ID"
+          v-model="pid">
     <button class="startProcess"
             type="button"
             v-on:click="startProcess()">启动流程</button>
@@ -114,6 +124,8 @@ export default {
   },
   data () {
     return {
+      endpoint: '南京',
+      pid: '',
       preport: '出发点',
       nextport: '黄石',
       now: new Date(),
@@ -201,6 +213,10 @@ export default {
             this.nextport = this.portList[this.portindex.indexOf(this.index)]
           }
           this.interval += this.delay_time * 3600000 / beishu
+          if (this.delay_time > 0) {
+            this.endpoint = '铜陵'
+          }
+          this.delay_time = 0
           this.total_delay += this.delay_time
           console.log('停留中')
         }// 总延迟时间要写一下计算
@@ -264,12 +280,12 @@ export default {
 }
 .startProcess {
   position: absolute;
-  top: 15px;
-  left: 0;
+  top: 30px;
+  left: 200px;
   background-color: #4caf50; /* Green */
   border: none;
   color: white;
-  padding: 10px 20px;
+  padding: 0px 10px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -281,7 +297,7 @@ export default {
 .delaytime {
   position: absolute;
   top: 30px;
-  left: 150px;
+  left: 350px;
   border: none;
   color: white;
   text-align: center;
@@ -292,7 +308,9 @@ export default {
 .submit {
   position: absolute;
   top: 30px;
-  left: 350px;
+  left: 550px;
+  width: 80px;
+  background-color: #4caf50; /* Green */
   border: none;
   color: white;
   text-align: center;
@@ -302,5 +320,17 @@ export default {
 }
 .submit:focus {
   background-color: red;
+}
+.processid{
+  position: absolute;
+  top: 30px;
+  left: 5px;
+  /* border: none; */
+  color: white;
+  /* text-align: center; */
+  width: 180px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
 }
 </style>
