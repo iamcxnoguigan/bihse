@@ -5,17 +5,27 @@
              @ready="handler">
     <bm-overlay ref="customOverlay"
                 :class="{sample: true}"
-                :icon="{url: 'https://www.cnblogs.com/images/cnblogs_com/progor/1390402/o_bike2.png', size: {width: 5, height: 5}}"
+                :icon="{url: 'https://www.cnblogs.com/images/cnblogs_com/progor/1390402/o_bike2.png', size: {width: 25, height: 50}}"
                 pane="labelPane"
                 @draw="draw">
     </bm-overlay>
-    <bm-driving
+    <bm-driving :start="start" :end="endpoint" @searchcomplete="handleSearchComplete" :panel="false" :autoViewport="true"></bm-driving>
+      <bml-lushu
+        ref="car"
+        @stop="reset"
+        :path="path"
+        :icon= icon
+        :play="play"
+        :speed= speed
+        :rotation="false">
+      </bml-lushu>
+    <!-- <bm-driving
       start="咸宁"
       :end="endpoint"
       :auto-viewport="true"
       policy="BMAP_DRIVING_POLICY_LEAST_DISTANCE"
       :panel="false">
-    </bm-driving>
+    </bm-driving> -->
     <input class='processid'
           placeholder="流程模型ID"
           v-model="pid">
@@ -102,13 +112,14 @@
 </template>
 
 <script>
-import { BmOverlay } from 'vue-baidu-map'
+import { BmOverlay, BmlLushu } from 'vue-baidu-map'
 import axios from 'axios'
 import { setInterval, clearInterval } from 'timers'
 
 export default {
   components: {
-    BmOverlay
+    BmOverlay,
+    BmlLushu
   },
   watch: {
     position: {
@@ -124,6 +135,17 @@ export default {
   },
   data () {
     return {
+      start: '上饶',
+      speed: 12000,
+      play: true,
+      path: [],
+      icon: {
+        url: 'http://api.map.baidu.com/library/LuShu/1.2/examples/car.png',
+        size: {width: 52, height: 26},
+        opts: {anchor: {width: 12, height: 25},
+          imageSize: {width: 26, height: 13}
+        }
+      },
       endpoint: '南京',
       pid: '',
       preport: '出发点',
@@ -170,8 +192,21 @@ export default {
     await this.getPosition()
   },
   methods: {
+    reset () {
+      this.play = false
+    },
+    handleSearchComplete (res) {
+      this.path = res.getPlan(0).getRoute(0).getPath()
+      console.log(res.getPlan(0).getRoute(0).getPath())
+    },
     handleCommand () {
+      console.log(this.$refs.car.originInstance._overlay._point)
       this.delay_time = this.dtime
+      if (this.delay_time > 0) {
+        this.start = { lat: 28.976358,
+          lng: 118.669587}// 第700个点
+        this.endpoint = '芜湖'
+      }
       console.log(this.delay_time)
     },
     handler ({ BMap, map }) {
@@ -213,9 +248,9 @@ export default {
             this.nextport = this.portList[this.portindex.indexOf(this.index)]
           }
           this.interval += this.delay_time * 3600000 / beishu
-          if (this.delay_time > 0) {
-            this.endpoint = '铜陵'
-          }
+          // if (this.delay_time > 0) {
+          //   this.endpoint = '铜陵'
+          // }
           this.delay_time = 0
           this.total_delay += this.delay_time
           console.log('停留中')
@@ -332,5 +367,9 @@ export default {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
+}
+.car{
+  width :1vm;
+ height:1vm;
 }
 </style>
