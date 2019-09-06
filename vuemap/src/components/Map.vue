@@ -9,7 +9,7 @@
                 pane="labelPane"
                 @draw="draw">
     </bm-overlay>
-    <bm-driving :start="start" :end="endpoint" @searchcomplete="handleSearchComplete" :panel="false" :autoViewport="true"></bm-driving>
+    <!-- <bm-driving :start="start" :end="endpoint" @searchcomplete="handleSearchComplete" :panel="false" :autoViewport="true"></bm-driving>
       <bml-lushu
         ref="car"
         @stop="reset"
@@ -18,7 +18,7 @@
         :play="play"
         :speed= speed
         :rotation="false">
-      </bml-lushu>
+      </bml-lushu> -->
     <!-- <bm-driving
       start="咸宁"
       :end="endpoint"
@@ -46,6 +46,32 @@
       </el-form-item>
     </el-form>
     <p>当前时间：{{this.now}}<p>
+      <div class='infoalert' v-show="alertshow">
+        <table border="1">
+            <tr>
+              <th>温度</th>
+              <th><p v-show="tred" style="color:red;">{{t}}</p>
+                  <p v-show="!tred">{{t}}  </p></th>
+            </tr>
+            <tr>
+              <td>湿度</td>
+              <td><p v-show="tred" style="color:red;">{{h}}</p>
+                  <p v-show="!tred">{{h}}  </p></td>
+            </tr>
+            <tr>
+              <td>当前港口或下一港口</td>
+              <td>{{nextport}}</td>
+            </tr>
+        </table>
+        <!-- <p>温度：</p>
+        <p v-show="tred" style="color:red;">{{t}}</p>
+        <p v-show="!tred">{{t}}  </p>
+        <p>湿度：</p>
+        <p v-show="tred" style="color:red;">{{h}}</p>
+        <p v-show="!tred">{{h}}  </p>
+        <p>当前港口或下一港口:</p>
+        <p>{{nextport}}</p> -->
+      </div>
         <div v-show="shipshow"
              class="info">
           <table border="1">
@@ -115,6 +141,7 @@
 import { BmOverlay, BmlLushu } from 'vue-baidu-map'
 import axios from 'axios'
 import { setInterval, clearInterval } from 'timers'
+import { truncate } from 'fs'
 
 export default {
   components: {
@@ -131,10 +158,28 @@ export default {
     interval: function () {
       clearInterval(this.timer)
       this.timer = setInterval(this.setPosition, this.interval)
+    },
+    temperature: function () {
+      if (this.alertshow) {
+
+      } else if (this.temperature > 30 || this.humidity < 35) {
+        this.alertshow = true
+        this.t = this.temperature
+        this.h = this.humidity
+        if (this.temperature > 30) {
+          this.tred = true
+        }
+        if (this.humidity < 35) {
+          this.hred = true
+        }
+      }
     }
   },
   data () {
     return {
+      tred: false,
+      hred: false,
+      alertshow: false,
       start: '上饶',
       speed: 12000,
       play: true,
@@ -237,7 +282,7 @@ export default {
         this.index += 1
         var t2 = new Date(m[2])
         this.position = { lng: m[0], lat: m[1] }
-        var beishu = 2400
+        var beishu = 240
         this.interval = (t2 - this.t1) / beishu
         if (this.portindex.indexOf(this.index) !== -1) {
           if (this.portindex.indexOf(this.index) === 0) {
@@ -258,8 +303,8 @@ export default {
         this.t1 = t2
         var t = parseInt(Math.random() * 100)
         var h = parseInt(Math.random() * 500)
-        this.temperature = 23 + t / 10
-        this.humidity = 30 + h / 10
+        this.temperature = 20.5 + t / 10
+        this.humidity = 32.5 + h / 10
         var asss = new Date(t2 - new Date('2017-12-06 18:42:00') + this.total_delay + this.nowtime)
         this.now = asss
         console.log('lng:' + this.position.lng + ' ' + 'lat:' + this.position.lat)
@@ -313,6 +358,11 @@ export default {
   top: 260px;
   left: 1150px;
 }
+.infoalert{
+  position: absolute;
+  top: 300px;
+  left: 1150px;
+}
 .startProcess {
   position: absolute;
   top: 30px;
@@ -361,7 +411,7 @@ export default {
   top: 30px;
   left: 5px;
   /* border: none; */
-  color: white;
+  color: black;
   /* text-align: center; */
   width: 180px;
   text-decoration: none;
