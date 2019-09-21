@@ -3,129 +3,54 @@
              :center="center"
              :zoom="zoom"
              @ready="handler">
+    <div>
+<el-button type="primary" plain class='vs' style="width:10%">Vessl State</el-button>
+<el-button type="primary" class='startProcess' icon="el-icon-caret-right " v-on:click="startProcess()"></el-button>
+        <!-- <button class="el-icon-caret-right"
+            type="button"
+            v-on:click="startProcess()"></button> -->
+      <el-table
+      :header-cell-style="{background:'#eef1f6',color:'#606266'}"
+    :data="tableData"
+    height="365"
+    border
+    style="width:16.5%;position: absolute;top: 55px;
+  left: 320px;"
+   >
+    <el-table-column
+      prop="IOTname"
+      label="Logistics information"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="IOTvalue"
+      label="value"
+      width="135">
+    </el-table-column>
+  </el-table>
+    </div>
     <bm-overlay ref="customOverlay"
                 :class="{sample: true}"
                 :icon="{url: 'https://www.cnblogs.com/images/cnblogs_com/progor/1390402/o_bike2.png', size: {width: 25, height: 50}}"
                 pane="labelPane"
                 @draw="draw">
     </bm-overlay>
-    <bm-driving :start="start" :end="endpoint" @searchcomplete="handleSearchComplete" :panel="false" :autoViewport="true"></bm-driving>
-      <bml-lushu
-        ref="car"
-        @stop="reset"
-        :path="path"
-        :icon= icon
-        :play="play"
-        :speed= speed
-        :rotation="true">
-      </bml-lushu>
-    <!-- <bm-driving
-      start="咸宁"
-      :end="endpoint"
-      :auto-viewport="true"
-      policy="BMAP_DRIVING_POLICY_LEAST_DISTANCE"
-      :panel="false">
-    </bm-driving> -->
-    <input class='processid'
-          placeholder="流程模型ID"
-          v-model="pid">
-    <button class="startProcess"
-            type="button"
-            v-on:click="startProcess()">启动流程</button>
-    <el-form ref="ruleForm"
-             label-width="20px"
-             class="demo-ruleForm">
-      <el-form-item prop="delay_time">
-        <el-input class="delaytime"
-                  placeholder="延误时间(单位小时)"
-                  v-model="dtime"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button class="submit"
-                   @click="handleCommand()">提交</el-button>
-      </el-form-item>
-    </el-form>
-    <p>当前时间：{{this.now}}<p>
-      <!-- <div class='infoalert' v-show="alertshow">
-        <table border="1">
-            <tr>
-              <th>温度</th>
-              <th><p v-show="tred" style="color:red;">{{t}}</p>
-                  <p v-show="!tred">{{t}}  </p></th>
-            </tr>
-            <tr>
-              <td>湿度</td>
-              <td><p v-show="tred" style="color:red;">{{h}}</p>
-                  <p v-show="!tred">{{h}}  </p></td>
-            </tr>
-            <tr>
-              <td>当前港口或下一港口</td>
-              <td>{{nextport}}</td>
-            </tr>
-        </table>
-      </div> -->
-        <div v-show="shipshow"
-             class="info">
-          <table border="1">
-            <tr>
-              <th>船只物流信息</th>
-              <th>数值</th>
-            </tr>
-            <tr>
-              <td>经度</td>
-              <td>{{ position.lng}}</td>
-            </tr>
-            <tr>
-              <td>维度</td>
-              <td>{{position.lat}}</td>
-            </tr>
-            <tr>
-              <td>当前港口或下一港口</td>
-              <td>{{nextport}} </td>
-            </tr>
-            <tr>
-              <td>上一港口</td>
-              <td>{{preport}} </td>
-            </tr>
-            <tr>
-              <td>温度</td>
-              <td>{{temperature}} ℃</td>
-            </tr>
-            <tr>
-              <td>湿度</td>
-              <td>{{humidity}} %</td>
-            </tr>
-          </table>
-        </div>
-        <div v-show="carshow"
-             class="infocar">
-          <table border="1">
-            <tr>
-              <th>货车物流信息</th>
-              <th>数值</th>
-            </tr>
-            <tr>
-              <td>经度</td>
-              <td>{{ position.lng}}</td>
-            </tr>
-            <tr>
-              <td>维度</td>
-              <td>{{position.lat}}</td>
-            </tr>
-            <tr>
-              <td>状态</td>
-              <td>C语言之父</td>
-            </tr>
-            <tr>
-              <td>下一港口</td>
-              <td>C语言之父</td>
-            </tr>
-            <tr>
-              <td>港口延误时间</td>
-              <td>C语言之父</td>
-            </tr>
-          </table>
-        </div>
+    <el-alert
+    style="width:310px;
+    position: absolute;top: 450px;
+  left: 320px;"
+    title="The temperature is too high. Please cool down."
+    type="warning"
+    show-icon>
+  </el-alert>
+  <el-alert
+    style="width:310px;
+    position: absolute;top: 550px;
+  left: 320px;"
+    title="The temperature is too high. Please cool down."
+    type="warning"
+    show-icon>
+  </el-alert>
   </baidu-map>
 </template>
 
@@ -133,6 +58,7 @@
 import { BmOverlay, BmlLushu } from 'vue-baidu-map'
 import axios from 'axios'
 import { setInterval, clearInterval } from 'timers'
+var moment = require('moment')
 
 export default {
   components: {
@@ -151,6 +77,10 @@ export default {
       this.timer = setInterval(this.setPosition, this.interval)
     },
     temperature: function () {
+      // if(this.temperature >= 35){
+      //   this.TA = true;
+      //   this.t = this.temperature
+      // }
       if (this.alertshow) {
 
       } else if (this.temperature > 30 || this.humidity < 35) {
@@ -218,7 +148,9 @@ export default {
       },
       portList: ['黄石', '武穴', '九江', '安庆', '池州', '铜陵', '芜湖', '马鞍山', '南京', '仪征', '镇江', '泰州', '常州', '江阴'],
 
-      portindex: [110, 159, 205, 378, 449, 495, 600, 669, 695, 715, 746, 824, 875, 922]
+      portindex: [110, 159, 205, 378, 449, 495, 600, 669, 695, 715, 746, 824, 875, 922],
+      tableData: [
+      ]
     }
   },
   // mounted() {
@@ -247,8 +179,8 @@ export default {
     },
     handler ({ BMap, map }) {
       console.log(BMap, map)
-      this.center.lng = 118.18214
-      this.center.lat = 30.640765
+      this.center.lng = 118.48214
+      this.center.lat = 30.20765
       this.zoom = 8
     },
     draw ({ el, BMap, map }) {
@@ -298,8 +230,51 @@ export default {
         this.humidity = 32.5 + h / 10
         var asss = new Date(t2 - new Date('2017-12-06 18:42:00') + this.total_delay + this.nowtime)
         this.now = asss
+        this.vv = m[3]
+        // console.log(moment(this.now).format('YYYY-MM-DD HH:mm:ss'))
         console.log('lng:' + this.position.lng + ' ' + 'lat:' + this.position.lat)
+        this.tableData = [{
+          IOTname: 'Longitude',
+          IOTvalue: this.position.lng
+        },
+        {
+          IOTname: 'Latitude',
+          IOTvalue: this.position.lat
+        },
+        {
+          IOTname: 'Speed',
+          IOTvalue: this.vv + ' km/h'
+        },
+        {
+          IOTname: 'Temperature',
+          IOTvalue: this.temperature + ' ℃'
+        },
+        {
+          IOTname: 'Humidity',
+          IOTvalue: this.humidity + ' %'
+        },
+        {
+          IOTname: 'Time',
+          IOTvalue: moment(this.now).format('YYYY-MM-DD HH:mm')
+        }
+        ]
       }
+    },
+    initDateTime (date) {
+      var d = date
+      var vYear = d.getFullYear()
+      var vMon = d.getMonth() + 1
+      var vDay = d.getDate()
+      var hours = d.getHours()
+      var minutes = d.getMinutes()
+      var s = d.getSeconds()
+      var currDay = d.getDate() + 2
+      var today = vYear + '-' + (vMon < 10 ? '0' + vMon : vMon) + '-' + (vDay < 10 ? '0' + vDay : vDay) + ' ' + (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes) + ':' + (s < 10 ? '0' + s : s)
+      var current = vYear + '-' + (vMon < 10 ? '0' + vMon : vMon) + '-' + (currDay < 10 ? '0' + currDay : currDay) + ' ' + (hours < 10 ? '0' + hours : hours) + ':' +
+            (minutes < 10 ? '0' + minutes : minutes) + ':' + (s < 10 ? '0' + s : s)
+      document.forms[0].startTime.value = today
+      document.forms[0].endTime.value = current
+      document.forms[0].newDate.value = today
     },
     startProcess () {
       this.play = true
@@ -314,9 +289,9 @@ export default {
 </script>
 <style scoped>
 .bm-view {
-  float: left;
-  width: 60%;
-  height: 600px;
+  float: right;
+  width: 80%;
+  height: 800px;
 }
 .sample {
   height: 0px;
@@ -342,8 +317,8 @@ export default {
 }
 .info {
   position: absolute;
-  top: 60px;
-  left: 1150px;
+  top: 0px;
+  left: 320px;
 }
 .infocar {
   position: absolute;
@@ -355,14 +330,19 @@ export default {
   top: 300px;
   left: 1150px;
 }
+.vs{
+position: absolute;
+  top: 10px;
+  left: 320px;
+}
 .startProcess {
   position: absolute;
-  top: 30px;
-  left: 200px;
-  background-color: #4caf50; /* Green */
+  top: 20px;
+  left: 560px;
+  background-color: #606060; /* Green */
   border: none;
   color: white;
-  padding: 0px 10px;
+  padding: 5px 10px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
