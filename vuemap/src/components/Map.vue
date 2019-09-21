@@ -9,7 +9,7 @@
                 pane="labelPane"
                 @draw="draw">
     </bm-overlay>
-    <!-- <bm-driving :start="start" :end="endpoint" @searchcomplete="handleSearchComplete" :panel="false" :autoViewport="true"></bm-driving>
+    <bm-driving :start="start" :end="endpoint" @searchcomplete="handleSearchComplete" :panel="false" :autoViewport="true"></bm-driving>
       <bml-lushu
         ref="car"
         @stop="reset"
@@ -17,8 +17,8 @@
         :icon= icon
         :play="play"
         :speed= speed
-        :rotation="false">
-      </bml-lushu> -->
+        :rotation="true">
+      </bml-lushu>
     <!-- <bm-driving
       start="咸宁"
       :end="endpoint"
@@ -46,7 +46,7 @@
       </el-form-item>
     </el-form>
     <p>当前时间：{{this.now}}<p>
-      <div class='infoalert' v-show="alertshow">
+      <!-- <div class='infoalert' v-show="alertshow">
         <table border="1">
             <tr>
               <th>温度</th>
@@ -63,15 +63,7 @@
               <td>{{nextport}}</td>
             </tr>
         </table>
-        <!-- <p>温度：</p>
-        <p v-show="tred" style="color:red;">{{t}}</p>
-        <p v-show="!tred">{{t}}  </p>
-        <p>湿度：</p>
-        <p v-show="tred" style="color:red;">{{h}}</p>
-        <p v-show="!tred">{{h}}  </p>
-        <p>当前港口或下一港口:</p>
-        <p>{{nextport}}</p> -->
-      </div>
+      </div> -->
         <div v-show="shipshow"
              class="info">
           <table border="1">
@@ -181,8 +173,8 @@ export default {
       hred: false,
       alertshow: false,
       start: '上饶',
-      speed: 12000,
-      play: true,
+      speed: 15000,
+      play: false,
       path: [],
       icon: {
         url: 'http://api.map.baidu.com/library/LuShu/1.2/examples/car.png',
@@ -282,15 +274,15 @@ export default {
         this.index += 1
         var t2 = new Date(m[2])
         this.position = { lng: m[0], lat: m[1] }
-        var beishu = 240
+        var beishu = 2000
         this.interval = (t2 - this.t1) / beishu
         if (this.portindex.indexOf(this.index) !== -1) {
           if (this.portindex.indexOf(this.index) === 0) {
             this.preport = '出发点'
             this.nextport = this.portList[0]
           } else {
-            this.preport = this.portList[this.portindex.indexOf(this.index) - 1]
-            this.nextport = this.portList[this.portindex.indexOf(this.index)]
+            this.preport = this.portList[this.portindex.indexOf(this.index)]
+            this.nextport = this.portList[this.portindex.indexOf(this.index) + 1]
           }
           this.interval += this.delay_time * 3600000 / beishu
           // if (this.delay_time > 0) {
@@ -311,6 +303,7 @@ export default {
       }
     },
     startProcess () {
+      this.play = true
       this.shipshow = true
       this.setPosition()
     }
