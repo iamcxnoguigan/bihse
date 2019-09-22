@@ -4,11 +4,20 @@
              :zoom="zoom"
              @ready="handler">
     <div>
-<el-button type="primary" plain class='vs' style="width:10%">Vessl State</el-button>
+<el-button type="primary" plain class='vs' style="width:8%">Vessl State</el-button>
 <el-button type="primary" class='startProcess' icon="el-icon-caret-right " v-on:click="startProcess()"></el-button>
-        <!-- <button class="el-icon-caret-right"
-            type="button"
-            v-on:click="startProcess()"></button> -->
+<el-button type="primary" class="delaytime" @click="dialogFormVisible = true">Delay</el-button>
+<el-dialog title="Delay Info" :visible.sync="dialogFormVisible">
+  <el-form :model="form">
+    <el-form-item label="Delay" :label-width="formLabelWidth">
+      <el-input placeholder="Delay time (/h)" v-model="form.time" autocomplete="off"></el-input>
+    </el-form-item>
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisible = false">Cancel</el-button>
+    <el-button type="primary" @click="handleCommand()">Submit</el-button>
+  </div>
+</el-dialog>
       <el-table
       :header-cell-style="{background:'#eef1f6',color:'#606266'}"
     :data="tableData"
@@ -35,22 +44,16 @@
                 pane="labelPane"
                 @draw="draw">
     </bm-overlay>
-    <!-- <el-alert
-    style="width:310px;
-    position: absolute;top: 450px;
-  left: 320px;"
-    title="The temperature is too high. Please cool down."
-    type="warning"
-    show-icon>
-  </el-alert>
-  <el-alert
-    style="width:310px;
-    position: absolute;top: 550px;
-  left: 320px;"
-    title="The temperature is too high. Please cool down."
-    type="warning"
-    show-icon>
-  </el-alert> -->
+    <bm-driving :start="start" :end="endpoint" @searchcomplete="handleSearchComplete" :panel="false" :autoViewport="true"></bm-driving>
+      <bml-lushu
+        ref="car"
+        @stop="reset"
+        :path="path"
+        :icon= icon
+        :play="play"
+        :speed= speed
+        :rotation="true">
+      </bml-lushu>
   </baidu-map>
 </template>
 
@@ -77,22 +80,24 @@ export default {
       this.timer = setInterval(this.setPosition, this.interval)
     },
     temperature: function () {
-      if (this.temperature > 39) {
-        this.open1()
-      }
-      if (this.temperature < 10) {
-        this.open2()
-      }
-      if (this.humidity < 20) {
-        this.open3()
-      }
-      if (this.humidity > 79) {
-        this.open4()
+      if (this.alertshow) {
+
+      } else if (this.temperature > 30 || this.humidity < 35) {
+        this.alertshow = true
+        this.t = this.temperature
+        this.h = this.humidity
+        if (this.temperature > 30) {
+          this.tred = true
+        }
+        if (this.humidity < 35) {
+          this.hred = true
+        }
       }
     }
   },
   data () {
     return {
+      dialogFormVisible: false,
       tred: false,
       hred: false,
       alertshow: false,
@@ -145,7 +150,11 @@ export default {
 
       portindex: [110, 159, 205, 378, 449, 495, 600, 669, 695, 715, 746, 824, 875, 922],
       tableData: [
-      ]
+      ],
+      form: {
+        time: ''
+      },
+      formLabelWidth: '120px'
     }
   },
   // mounted() {
@@ -163,8 +172,9 @@ export default {
       console.log(res.getPlan(0).getRoute(0).getPath())
     },
     handleCommand () {
+      this.dialogFormVisible = false
       console.log(this.$refs.car.originInstance._overlay._point)
-      this.delay_time = this.dtime
+      this.delay_time = this.form.time
       if (this.delay_time > 0) {
         this.start = { lat: 28.976358,
           lng: 118.669587}// 第700个点
@@ -200,7 +210,7 @@ export default {
         this.index += 1
         var t2 = new Date(m[2])
         this.position = { lng: m[0], lat: m[1] }
-        var beishu = 500
+        var beishu = 1500
         this.interval = (t2 - this.t1) / beishu
         if (this.portindex.indexOf(this.index) !== -1) {
           if (this.portindex.indexOf(this.index) === 0) {
@@ -219,10 +229,10 @@ export default {
           console.log('停留中')
         }// 总延迟时间要写一下计算
         this.t1 = t2
-        var t = parseInt(Math.random() * 300)
-        var h = parseInt(Math.random() * 600)
-        this.temperature = 10 + t / 10
-        this.humidity = 20 + h / 10
+        var t = parseInt(Math.random() * 100)
+        var h = parseInt(Math.random() * 500)
+        this.temperature = 20.5 + t / 10
+        this.humidity = 32.5 + h / 10
         var asss = new Date(t2 - new Date('2017-12-06 18:42:00') + this.total_delay + this.nowtime)
         this.now = asss
         this.vv = m[3]
@@ -279,32 +289,6 @@ export default {
       this.play = true
       this.shipshow = true
       this.setPosition()
-    },
-    open1 () {
-      this.$message({
-        message: 'The temperature is too high. Please cool down.',
-        type: 'warning'
-      })
-    },
-    open2 () {
-      this.$message({
-        message: 'The temperature is too low. Please raise the temperature.',
-        type: 'warning'
-      })
-    },
-
-    open3 () {
-      this.$message({
-        message: 'Excessive humidity, please dehumidify.',
-        type: 'warning'
-      })
-    },
-
-    open4 () {
-      this.$message({
-        message: 'Humidity is too low, please humidify.',
-        type: 'warning'
-      })
     }
   },
   beforeDestroy () {
@@ -362,12 +346,12 @@ position: absolute;
 }
 .startProcess {
   position: absolute;
-  top: 20px;
-  left: 560px;
+  top: 10px;
+  left: 490px;
   background-color: #606060; /* Green */
   border: none;
   color: white;
-  padding: 5px 10px;
+  padding: 10px 10px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -378,14 +362,13 @@ position: absolute;
 }
 .delaytime {
   position: absolute;
-  top: 30px;
-  left: 350px;
+  top: 10px;
+  left: 540px;
   border: none;
-  color: white;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+
 }
 .submit {
   position: absolute;

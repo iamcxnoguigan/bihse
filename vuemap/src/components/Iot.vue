@@ -12,7 +12,7 @@
       <el-table
       :header-cell-style="{background:'#eef1f6',color:'#606266'}"
     :data="tableData"
-    height="365"
+    height="390"
     border
     style="width:16.5%;position: absolute;top: 55px;
   left: 320px;"
@@ -232,30 +232,35 @@ export default {
         this.vv = m[3]
         // console.log(moment(this.now).format('YYYY-MM-DD HH:mm:ss'))
         console.log('lng:' + this.position.lng + ' ' + 'lat:' + this.position.lat)
-        this.tableData = [{
-          IOTname: 'Longitude',
-          IOTvalue: this.position.lng
-        },
-        {
-          IOTname: 'Latitude',
-          IOTvalue: this.position.lat
-        },
-        {
-          IOTname: 'Speed',
-          IOTvalue: this.vv + ' km/h'
-        },
-        {
-          IOTname: 'Temperature',
-          IOTvalue: this.temperature + ' ℃'
-        },
-        {
-          IOTname: 'Humidity',
-          IOTvalue: this.humidity + ' %'
-        },
-        {
-          IOTname: 'Time',
-          IOTvalue: moment(this.now).format('YYYY-MM-DD HH:mm')
-        }
+        this.tableData = [
+          {
+            IOTname: 'Port InterVal',
+            IOTvalue: this.preport + ' --> ' + this.nextport
+          },
+          {
+            IOTname: 'Longitude',
+            IOTvalue: this.position.lng
+          },
+          {
+            IOTname: 'Latitude',
+            IOTvalue: this.position.lat
+          },
+          {
+            IOTname: 'Speed',
+            IOTvalue: this.vv + ' km/h'
+          },
+          {
+            IOTname: 'Temperature',
+            IOTvalue: this.temperature + ' ℃'
+          },
+          {
+            IOTname: 'Humidity',
+            IOTvalue: this.humidity + ' %'
+          },
+          {
+            IOTname: 'Time',
+            IOTvalue: moment(this.now).format('YYYY-MM-DD HH:mm')
+          }
         ]
       }
     },

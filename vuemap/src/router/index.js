@@ -5,6 +5,7 @@ import Map from '@/components/Map'
 import Annotation from '@/components/Annotation'
 import Iot from '@/components/Iot'
 import ColdChain from '@/components/ColdChain'
+import SSP from '@/components/SSP'
 
 Vue.use(Router)
 
@@ -34,6 +35,11 @@ export default new Router({
       path: '/coldChain',
       name: 'ColdChain',
       component: ColdChain
+    },
+    {
+      path: '/ssp',
+      name: 'SSP',
+      component: SSP
     }
   ]
 })

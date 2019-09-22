@@ -30,8 +30,8 @@
                 <el-col :xs="4" :sm="4" :md="4" :lg="4">
                     <div >
                       <el-radio-group v-model="isCollapse" style="margin-bottom: 0px;">
-                          <el-radio-button :label="false">展开</el-radio-button>
-                          <el-radio-button :label="true">收起</el-radio-button>
+                          <el-radio-button :label="false">expand</el-radio-button>
+                          <el-radio-button :label="true">collapse</el-radio-button>
                       </el-radio-group>
                         <el-menu default-active="1" class="el-menu-vertical-demo" style="min-height:800px;"  @open="handleOpen" @close="handleClose" :collapse="isCollapse" @select="handleSelect">
                             <el-menu-item index="1"><i class="el-icon-setting"></i><span >Annotation Editor</span></el-menu-item>
@@ -100,8 +100,8 @@ export default {
           this.$router.push('/ColdChain')
           this.breadcrumbItems = ['ColdChain']
           break
-        case '3':
-          this.$router.push('/Page3')
+        case '2-3':
+          this.$router.push('/SSP')
           this.breadcrumbItems = ['导航三']
           break
       }
