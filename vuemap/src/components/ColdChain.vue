@@ -77,16 +77,16 @@ export default {
       this.timer = setInterval(this.setPosition, this.interval)
     },
     temperature: function () {
-      if (this.temperature > 39) {
+      if (this.temperature > 35) {
         this.open1()
       }
-      if (this.temperature < 10) {
+      if (this.temperature < 15) {
         this.open2()
       }
-      if (this.humidity < 20) {
+      if (this.humidity < 25) {
         this.open3()
       }
-      if (this.humidity > 79) {
+      if (this.humidity > 75) {
         this.open4()
       }
     }
@@ -200,16 +200,12 @@ export default {
         this.index += 1
         var t2 = new Date(m[2])
         this.position = { lng: m[0], lat: m[1] }
-        var beishu = 500
+        var beishu = 1000
         this.interval = (t2 - this.t1) / beishu
         if (this.portindex.indexOf(this.index) !== -1) {
-          if (this.portindex.indexOf(this.index) === 0) {
-            this.preport = '出发点'
-            this.nextport = this.portList[0]
-          } else {
-            this.preport = this.portList[this.portindex.indexOf(this.index)]
-            this.nextport = this.portList[this.portindex.indexOf(this.index) + 1]
-          }
+          this.preport = this.portList[this.portindex.indexOf(this.index)]
+          this.nextport = this.portList[this.portindex.indexOf(this.index) + 1]
+
           this.interval += this.delay_time * 3600000 / beishu
           // if (this.delay_time > 0) {
           //   this.endpoint = '铜陵'

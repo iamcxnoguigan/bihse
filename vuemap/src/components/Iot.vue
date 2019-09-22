@@ -207,13 +207,9 @@ export default {
         var beishu = 2000
         this.interval = (t2 - this.t1) / beishu
         if (this.portindex.indexOf(this.index) !== -1) {
-          if (this.portindex.indexOf(this.index) === 0) {
-            this.preport = '出发点'
-            this.nextport = this.portList[0]
-          } else {
-            this.preport = this.portList[this.portindex.indexOf(this.index)]
-            this.nextport = this.portList[this.portindex.indexOf(this.index) + 1]
-          }
+          this.preport = this.portList[this.portindex.indexOf(this.index)]
+          this.nextport = this.portList[this.portindex.indexOf(this.index) + 1]
+
           this.interval += this.delay_time * 3600000 / beishu
           // if (this.delay_time > 0) {
           //   this.endpoint = '铜陵'
