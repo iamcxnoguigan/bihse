@@ -64,8 +64,8 @@
                             </el-radio-group>
                         </el-form-item> -->
                         <el-form-item>
-                            <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-                            <el-button @click="resetForm('ruleForm')">重置</el-button>
+                            <el-button type="primary" @click="submitForm('ruleForm')">Submit</el-button>
+                            <el-button @click="resetForm('ruleForm')">Reset</el-button>
                         </el-form-item>
                     </el-form>
                 </el-col>
@@ -103,12 +103,12 @@ export default {
       rules: {
         IF: [{
           required: true,
-          message: '条件不能为空',
+          message: 'Conditions cannot be empty',
           trigger: 'blur'
         }],
         Topic: [{
           required: true,
-          message: '场景主体不能为空',
+          message: 'The subject of the scene cannot be empty',
           trigger: 'blur'
         }]
         // age: [{

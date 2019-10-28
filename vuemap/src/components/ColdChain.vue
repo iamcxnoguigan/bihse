@@ -200,7 +200,7 @@ export default {
         this.index += 1
         var t2 = new Date(m[2])
         this.position = { lng: m[0], lat: m[1] }
-        var beishu = 1000
+        var beishu = 250
         this.interval = (t2 - this.t1) / beishu
         if (this.portindex.indexOf(this.index) !== -1) {
           this.preport = this.portList[this.portindex.indexOf(this.index)]
@@ -215,10 +215,10 @@ export default {
           console.log('停留中')
         }// 总延迟时间要写一下计算
         this.t1 = t2
-        var t = parseInt(Math.random() * 300)
-        var h = parseInt(Math.random() * 600)
-        this.temperature = 10 + t / 10
-        this.humidity = 20 + h / 10
+        var t = parseInt(Math.random() * 220)
+        var h = parseInt(Math.random() * 550)
+        this.temperature = 14 + t / 10
+        this.humidity = 22 + h / 10
         var asss = new Date(t2 - new Date('2017-12-06 18:42:00') + this.total_delay + this.nowtime)
         this.now = asss
         this.vv = m[3]
@@ -279,27 +279,31 @@ export default {
     open1 () {
       this.$message({
         message: 'The temperature is too high. Please cool down.',
-        type: 'warning'
+        type: 'warning',
+        duration: 1000
       })
     },
     open2 () {
       this.$message({
         message: 'The temperature is too low. Please raise the temperature.',
-        type: 'warning'
+        type: 'warning',
+        duration: 1000
       })
     },
 
     open3 () {
       this.$message({
         message: 'Excessive humidity, please dehumidify.',
-        type: 'warning'
+        type: 'warning',
+        duration: 1000
       })
     },
 
     open4 () {
       this.$message({
         message: 'Humidity is too low, please humidify.',
-        type: 'warning'
+        type: 'warning',
+        duration: 1000
       })
     }
   },
