@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import BaiduMap from 'vue-baidu-map'
 import ElementUI from 'element-ui'
+import echarts from 'echarts';
 
 Vue.config.productionTip = false
 Vue.use(BaiduMap, {
@@ -13,6 +14,9 @@ Vue.use(BaiduMap, {
 })
 Vue.use(ElementUI)
 /* eslint-disable no-new */
+
+Vue.prototype.$echarts = echarts
+
 new Vue({
   el: '#app',
   router,

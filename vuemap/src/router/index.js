@@ -6,6 +6,7 @@ import Annotation from '@/components/Annotation'
 import Iot from '@/components/Iot'
 import ColdChain from '@/components/ColdChain'
 import SSP from '@/components/SSP'
+import CD from '@/components/Collaboration_diagram'
 
 Vue.use(Router)
 
@@ -40,6 +41,11 @@ export default new Router({
       path: '/ssp',
       name: 'SSP',
       component: SSP
+    },
+    {
+      path: '/CD',
+      name: 'CD',
+      component: CD
     }
   ]
 })
