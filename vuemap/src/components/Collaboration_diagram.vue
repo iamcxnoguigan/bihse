@@ -1,83 +1,123 @@
 <template>
 <div>
-    <p>在下方文本框内输入有向图JSON（[source, target, value]）：</p>
-<textarea id="graph-input" style="height:210px;width:500px">
-[[0,1,10], [1,0,1], [1,2,5], [2,0,5]]
-</textarea>
-<p><button  v-on:click='draw' id="gen-btn">生成力导向图</button></p>
-<div id="echarts-main" style="height:320px;width:500px;border:1px dashed;"></div>
+  <p><button  v-on:click="geGraph">生成协作关系图</button></p>
+  <div id="echarts" />
 </div>
-
 </template>
+
 <script>
-
+import { drawChart } from '../../js/util/RelationGraph'
+import axios from 'axios'
 export default {
-  methods: {
-    // 发送请求获得数据
-    draw () {
-    //   var text = this.$('#graph-input').val()
-      console.log('ok')
-      var data = [[0, 1, 10], [1, 0, 1], [1, 2, 5], [2, 0, 5]]
-      var graph = this.data2Graph(data)
-      this.drawGraph(graph)
-    },
-    data2Graph (data) {
-      var graph = {}
-      var vertices = {}
-      var links = []
-      for (var i = 0; i < data.length; i++) {
-        var s = String(data[i][0])
-        var t = String(data[i][1])
-        var v = data[i][2]
-        vertices[s] = s
-        vertices[t] = t
-        links.push({'source': s, 'target': t, 'value': v})
-      }
-      var nodes = []
-      //   $.each(vertices, function (k, v) {
-      //     nodes.push({'name': v, 'value': v})
-      //   })
-      graph['links'] = links
-      graph['data'] = nodes
-      return graph
-    },
-
-    drawGraph (graph) {
-      var myChart = this.$echarts.init(document.getElementById('echarts-main'))
-      var option = {
-        tooltip: {},
-        series: [
+  name: 'RelationGraph',
+  data () {
+    return {
+      dataInput: {
+        style: {
+          height: 800 // canvas高度
+        }, //
+        node: [
+        ],
+        relation: [
+        ],
+        node_category: [
           {
-            type: 'graph',
-            layout: 'force',
-            symbolSize: 30,
-            edgeSymbol: ['none', 'arrow'],
-            data: graph.data,
-            links: graph.links,
-            roam: true,
-            label: {
+            name: 'Activity',
+            itemStyle: {
               normal: {
-                show: true,
-                formatter: function (e) {
-                  return e['data']['value']
-                }
+                color: 'blue'
               }
-            },
-            edgeLabel: {
+            }
+          }, {
+            name: 'Process',
+            itemStyle: {
               normal: {
-                show: true,
-                position: 'middle'
+                color: 'pink'
               }
-            },
-            force: {
-              repulsion: 1000,
-              edgeLength: 200
             }
           }
-        ]
+        ],
+        relation_category: {
+          // 'process': {
+          //   lineStyle: {
+          //     normal: {
+          //       opacity: 0.9,
+          //       width: 2,
+          //       curveness: 0,
+          //       type: 'solid', // 'solid''dashed''dotted'
+          //       color: 'rgba(0,0,0,0.6)'
+          //     },
+          //     emphasis: {
+          //       color: 'rgba(0,0,0,1)'
+          //     }
+          //   }
+          //   // TODO:可添加 隐藏的hideLineStyle ...
+          // },
+          default: {
+            lineStyle: {
+              normal: { curveness: 0.3 } // 可设置为负值
+            }
+          }
+          // "同学": {}  不添加则是默认
+        },
+        legend: ['Activity', 'Process'] // 可部分隐藏,此处省略了未知性别
       }
-      myChart.setOption(option)
+    }
+  },
+  mounted () {
+    setTimeout(() => {
+      this.geGraph()
+    }, 300)
+    // drawChart(this.dataInput)
+  },
+  methods: {
+    geGraph: async function () {
+      await axios.get('http://localhost:9001/getCollaboration').then(response => {
+        this.graphinfo = response.data
+        console.log(response.data)
+      }).catch(err => {
+        console.log(err)
+      })
+      this.GraphinfoClear()
+      this.Graphinfohandle()
+      setTimeout(() => {
+        drawChart(this.dataInput)
+      }, 300)
+    },
+    GraphinfoClear () {
+      this.dataInput.node = []
+      this.dataInput.relation = []
+    },
+
+    Graphinfohandle: function () {
+      for (var node of this.graphinfo.nodeinfo) {
+        console.log(node)
+        var Gnode = {
+          name: node.name,
+          value: node.processID,
+          category: ''
+
+        }
+        if (node.name === node.processID) Gnode.category = 'Process'
+        else {
+          Gnode.category = 'Activity'
+        }
+        this.dataInput.node.push(Gnode)
+      }
+      for (let i = 0; i < this.graphinfo.edgename.length; i++) {
+        var link = {
+          source: this.graphinfo.edge[i][0],
+          target: this.graphinfo.edge[i][1],
+          value: this.graphinfo.edgename[i],
+          symbol: ['none', 'arrow']
+        }
+        this.dataInput.relation.push(link)
+      }
     }
   }
 }
 </script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+</style>

@@ -1,33 +1,7 @@
-
+export {Relationship_extraction}
 var xml2js = require('xml2js')
 var parser = new xml2js.Parser()
 var fs = require('fs')
-fs.readFile('/home/cx/Desktop/7月视频+文件/dydt.xml', function (error, data) {
-  if (error) return console.log('读取文件失败,内容是' + error.message)
-  // console.log('读取文件成功,内容是' + data)
-  parser.parseString(data, function (errors, result) {
-    if (errors !== null) {
-      console.log(errors)
-      return
-    }
-    // console.log(typeof result)
-    // console.log(Object.getOwnPropertyDescriptor(Object.getOwnPropertyDescriptor(result, 'bpmn:definitions').value, 'bpmn:collaboration'))
-    // console.log(Object.getOwnPropertyNames(result))
-    var r = JSON.stringify(result)
-    r = r.replace(/bpmn:/g, 'bpmn_')
-    r = r.replace(/xmlns:/g, 'xmlns_')
-    r = r.replace(/bpmndi:/g, 'bpmndi_')
-    r = r.replace(/di:/g, 'di_')
-    r = r.replace(/dc:/g, 'dc_')
-    // console.log(r)
-    var bpmnjson = JSON.parse(r)
-    // console.log(Object.getOwnPropertyNames(bpmnjson.bpmn_definitions.bpmn_collaboration))
-    // console.log(bpmnjson.bpmn_definitions.bpmn_process[3].bpmn_callActivity[0])
-    // console.log(bpmnjson.bpmn_definitions.bpmn_process)
-    let ans = getGraph(bpmnjson)
-    // console.log(ans)
-  })
-})
 
 function getGraph (bpmnjson) {
   var messageFlow = bpmnjson.bpmn_definitions.bpmn_collaboration[0].bpmn_messageFlow
@@ -91,30 +65,43 @@ function getGraph (bpmnjson) {
 
   // console.log(edge, edgename)
   // console.log(nodeinfo)
-  console.log('nodemap:', nodemap)
-  console.log('nodeinfo', nodeinfo)
-  console.log('edge', edge)
-  console.log('edgename', edgename)
-  let a = new Graph(nodemap, edge, edgename)
+  let a = new Graph(nodemap, nodeinfo, edge, edgename)
   return a
 }
 
 class Graph {
-  constructor (v, edge, edgename) {
-    let len = v.length
-    this.vexs = [].slice.apply(v) // 顶点数组
-    let arcs = []
-    for (let i = 0; i < len; i++) { // 初始化矩阵
-      arcs[i] = new Array(len)
-      for (let j = 0; j < len; j++) {
-        arcs[i][j] = i === j ? 'null' : 'Unreachable'
-      }
-    }
-    for (let j = 0; j < edge.length; j++) {
-      let v1 = v.indexOf(edge[j][0])
-      let v2 = v.indexOf(edge[j][1])
-      arcs[v1][v2] = edgename[j] || 1 // 若为无向表，则赋值arcs[v1][v2]
-    }
-    this.arcs = arcs
+  constructor (nodemap, nodeinfo, edge, edgename) {
+    this.nodemap = nodemap
+    this.nodeinfo = nodeinfo
+    this.edge = edge
+    this.edgename = edgename
   }
+}
+
+function Relationship_extraction () {
+  fs.readFile('/home/cx/Desktop/7月视频+文件/dydt.xml', function (error, data) {
+    if (error) return console.log('读取文件失败,内容是' + error.message)
+    // console.log('读取文件成功,内容是' + data)
+    parser.parseString(data, function (errors, result) {
+      if (errors !== null) {
+        console.log(errors)
+        return
+      }
+      // console.log(typeof result)
+      // console.log(Object.getOwnPropertyDescriptor(Object.getOwnPropertyDescriptor(result, 'bpmn:definitions').value, 'bpmn:collaboration'))
+      // console.log(Object.getOwnPropertyNames(result))
+      var r = JSON.stringify(result)
+      r = r.replace(/bpmn:/g, 'bpmn_')
+      r = r.replace(/xmlns:/g, 'xmlns_')
+      r = r.replace(/bpmndi:/g, 'bpmndi_')
+      r = r.replace(/di:/g, 'di_')
+      r = r.replace(/dc:/g, 'dc_')
+      // console.log(r)
+      var bpmnjson = JSON.parse(r)
+      console.log(Object.getOwnPropertyNames(bpmnjson.bpmn_definitions.bpmn_collaboration))
+      // console.log(bpmnjson.bpmn_definitions.bpmn_process[3].bpmn_callActivity[0])
+      // console.log(bpmnjson.bpmn_definitions.bpmn_process)
+      return getGraph(bpmnjson)
+    })
+  })
 }
