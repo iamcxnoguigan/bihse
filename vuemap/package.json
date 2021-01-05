@@ -15,7 +15,7 @@
     "experss": "node ./js/experss.js"
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "echarts": "^4.4.0",
